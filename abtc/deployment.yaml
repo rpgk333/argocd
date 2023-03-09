@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: abtc-deploy
+  labels:
+    app.kita.server: abtc
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kita.server: abtc
+  template:
+    metadata:
+      labels:
+        app.kita.server: abtc
+    spec:
+      containers:
+      - name: abtc-app
+        image: kita/abtc
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080

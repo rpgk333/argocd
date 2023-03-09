@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: busybox-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+            #more_set_input_headers -r X-Forwarded-For $http_cf_connecting_ip;
+            #more_set_input_headers -r X-Real-Ip $http_cf_connecting_ip;
+            #more_set_headers "X-Forwarded-For $http_x_forwarded_for";
+            #proxy_set_header X-Forwarded-For "$remote_addr, $server_addr";
+            #proxy_set_header X-Forwarded-For "$proxy_add_x_forwarded_for";
+            more_set_input_headers "my-custom: rpgk";
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - 'test.rpgk.co.kr'
+    secretName: sslsecret
+  rules:
+  - http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: busybox-service
+            port:
+              number: 8080
+              #status:
+              #  loadBalancer:
+              #    ingress:
+              #    - ip: 10.99.179.26
+              #    host: test.rpgk.co.kr
